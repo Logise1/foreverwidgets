@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Chat WS Test</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --line: #334155;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --accent: #38bdf8;
+            --ok: #22c55e;
+            --bad: #ef4444;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Consolas, "Cascadia Code", monospace;
+            background: var(--bg);
+            color: var(--text);
+            padding: 24px;
+        }
+        h1 { font-size: 1.2rem; margin: 0 0 16px; }
+        .row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        input {
+            flex: 1;
+            min-width: 220px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: var(--card);
+            color: var(--text);
+            font: inherit;
+        }
+        button {
+            padding: 10px 16px;
+            border: 0;
+            border-radius: 8px;
+            background: var(--accent);
+            color: #0f172a;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        button.stop { background: var(--bad); color: #fff; }
+        button.clear { background: var(--line); color: #fff; }
+        #status {
+            margin: 0 0 12px;
+            color: var(--muted);
+        }
+        #status.open { color: var(--ok); }
+        #status.error { color: var(--bad); }
+        #log {
+            height: calc(100vh - 160px);
+            overflow: auto;
+            background: #020617;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 12px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .msg { margin: 0 0 10px; padding-bottom: 10px; border-bottom: 1px solid #1e293b; }
+        .meta { color: var(--muted); font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <h1>wss://ytstats.arielcapdevila.com/api/ws/chat</h1>
+    <div class="row">
+        <input id="videoId" type="text" placeholder="YouTube Video ID" spellcheck="false">
+        <button id="connect" type="button">Connect</button>
+        <button id="disconnect" class="stop" type="button">Disconnect</button>
+        <button id="clear" class="clear" type="button">Clear</button>
+    </div>
+    <p id="status">Disconnected</p>
+    <div id="log"></div>
+
+    <script>
+        let socket = null;
+        const videoInput = document.getElementById('videoId');
+        const statusEl = document.getElementById('status');
+        const logEl = document.getElementById('log');
+
+        const params = new URLSearchParams(location.search);
+        videoInput.value = params.get('q') || 'FOZP8x8AF4Q';
+
+        function setStatus(text, cls = '') {
+            statusEl.textContent = text;
+            statusEl.className = cls;
+        }
+
+        function addLog(title, payload) {
+            const wrap = document.createElement('div');
+            wrap.className = 'msg';
+            const meta = document.createElement('div');
+            meta.className = 'meta';
+            meta.textContent = `${new Date().toISOString()}  ${title}`;
+            const body = document.createElement('div');
+            body.textContent = typeof payload === 'string' ? payload : JSON.stringify(payload, null, 2);
+            wrap.appendChild(meta);
+            wrap.appendChild(body);
+            logEl.prepend(wrap);
+        }
+
+        function disconnect() {
+            if (socket) {
+                socket.close();
+                socket = null;
+            }
+        }
+
+        function connect() {
+            const videoId = videoInput.value.trim();
+            if (!videoId) {
+                setStatus('Enter a Video ID', 'error');
+                return;
+            }
+            disconnect();
+            const url = `wss://ytstats.arielcapdevila.com/api/ws/chat?q=${encodeURIComponent(videoId)}`;
+            setStatus('Connecting to ' + url);
+            addLog('CONNECTING', url);
+
+            socket = new WebSocket(url);
+
+            socket.addEventListener('open', () => {
+                setStatus('Connected: ' + url, 'open');
+                addLog('OPEN', 'WebSocket connected');
+            });
+
+            socket.addEventListener('message', (event) => {
+                let payload = event.data;
+                try { payload = JSON.parse(event.data); } catch (_) {}
+                addLog('MESSAGE', payload);
+                console.log('chat message', payload);
+            });
+
+            socket.addEventListener('error', (event) => {
+                setStatus('WebSocket error (see console)', 'error');
+                addLog('ERROR', String(event.type || 'error'));
+            });
+
+            socket.addEventListener('close', (event) => {
+                setStatus(`Closed (code ${event.code}${event.reason ? ': ' + event.reason : ''})`, 'error');
+                addLog('CLOSE', { code: event.code, reason: event.reason, wasClean: event.wasClean });
+                socket = null;
+            });
+        }
+
+        document.getElementById('connect').addEventListener('click', connect);
+        document.getElementById('disconnect').addEventListener('click', disconnect);
+        document.getElementById('clear').addEventListener('click', () => { logEl.innerHTML = ''; });
+        videoInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') connect();
+        });
+    </script>
+</body>
+</html>

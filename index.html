@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>All Widgets</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/shared.css">
+    <style>
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            background: #f1f5f9;
+            color: var(--text-main);
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: 280px minmax(0, 1fr) 340px;
+            height: 100vh;
+        }
+
+        .sidebar {
+            background: #0f172a;
+            color: #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .sidebar-brand {
+            padding: 1.4rem 1.2rem 1.1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar-brand h1 {
+            font-family: var(--font-heading);
+            color: #fff;
+            font-size: 1.8rem;
+            line-height: 1.1;
+        }
+
+        .sidebar-brand p {
+            margin-top: 0.35rem;
+            font-size: 0.78rem;
+            color: #94a3b8;
+        }
+
+        .sidebar-nav {
+            overflow-y: auto;
+            padding: 0.75rem 0 1.5rem;
+            flex: 1;
+        }
+
+        .nav-section {
+            margin: 0.85rem 0 0.25rem;
+            padding: 0.55rem 1.1rem 0.2rem;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+
+        .nav-item {
+            width: calc(100% - 16px);
+            margin: 2px 8px;
+            border: none;
+            background: transparent;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            padding: 0.7rem 0.8rem;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            font-family: var(--font-body);
+            font-size: 0.92rem;
+            font-weight: 600;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .nav-item i {
+            width: 1.2rem;
+            text-align: center;
+            color: var(--primary-color);
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+        }
+
+        .nav-item.active {
+            background: rgba(212, 36, 38, 0.18);
+            color: #fff;
+            box-shadow: inset 3px 0 0 var(--primary-color);
+        }
+
+        .workspace {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+            background: #e2e8f0;
+        }
+
+        .workspace-header {
+            padding: 1.15rem 1.5rem 0.9rem;
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .workspace-header h2 {
+            font-size: 1.35rem;
+            margin: 0;
+        }
+
+        .workspace-header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .preview-stage {
+            flex: 1;
+            min-height: 0;
+            margin: 1.25rem 1.5rem;
+            border-radius: 18px;
+            overflow: hidden;
+            position: relative;
+            background: #0f172a url('bg.avif') center / cover no-repeat;
+            box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
+        }
+
+        .preview-stage iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background: transparent;
+        }
+
+        .preview-empty {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            text-align: center;
+            padding: 2rem;
+            background: rgba(15, 23, 42, 0.35);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .preview-empty[hidden],
+        iframe[hidden] {
+            display: none !important;
+        }
+
+        .preview-empty i {
+            font-size: 2.6rem;
+            color: var(--primary-color);
+            margin-bottom: 0.8rem;
+        }
+
+        .inspector {
+            background: #fff;
+            border-left: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .inspector-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.25rem 1.2rem;
+        }
+
+        .inspector h3 {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #64748b;
+            margin-bottom: 1rem;
+        }
+
+        .inspector label {
+            font-weight: 700;
+            color: var(--text-secondary);
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+
+        .inspector input,
+        .inspector select,
+        .inspector textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            font-size: 0.95rem;
+            font-family: var(--font-body);
+            margin-bottom: 14px;
+            background: #f8fafc;
+        }
+
+        .inspector input:focus,
+        .inspector select:focus,
+        .inspector textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: #fff;
+        }
+
+        .hint {
+            font-size: 0.82rem;
+            color: #64748b;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 0.75rem 0.85rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .channel-results {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 240px;
+            overflow-y: auto;
+            margin: -6px 0 14px;
+        }
+
+        .channel-result {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            border-radius: 10px;
+            padding: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-family: var(--font-body);
+        }
+
+        .channel-result:hover,
+        .channel-result.selected {
+            border-color: var(--primary-color);
+            background: #fff5f5;
+        }
+
+        .channel-result img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .channel-result span {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.25;
+        }
+
+        .channel-status {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin: -8px 0 12px;
+        }
+
+        .no-fields {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .inspector-actions {
+            padding: 1rem 1.2rem 1.2rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .btn {
+            width: 100%;
+            border: none;
+            padding: 0.85rem;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: #fff;
+        }
+
+        .btn-primary:hover { background: #b01b1d; }
+        .btn-primary:disabled,
+        .btn-secondary:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #0f172a;
+            color: #fff;
+        }
+
+        .btn-secondary:hover { background: #1e293b; }
+        .btn-secondary.copied { background: var(--accent-color); }
+
+        @media (max-width: 1100px) {
+            .app {
+                grid-template-columns: 240px minmax(0, 1fr);
+                grid-template-rows: 1fr auto;
+            }
+            .inspector {
+                grid-column: 1 / -1;
+                border-left: none;
+                border-top: 1px solid #e2e8f0;
+                max-height: 42vh;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .app { grid-template-columns: 1fr; }
+            .sidebar { max-height: 38vh; }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <h1>All Widgets</h1>
+                <p>Choose, preview and copy</p>
+            </div>
+            <nav class="sidebar-nav" id="sidebar-nav"></nav>
+        </aside>
+
+        <main class="workspace">
+            <div class="workspace-header">
+                <h2 id="widget-title">Select a widget</h2>
+                <p id="widget-desc">Use the left menu to open a widget, customize it, and copy the OBS link.</p>
+            </div>
+            <div class="preview-stage">
+                <div class="preview-empty" id="preview-empty">
+                    <i class="fas fa-puzzle-piece"></i>
+                    <strong>Nothing selected</strong>
+                    <p>Click a widget in the menu to preview it here.</p>
+                </div>
+                <iframe id="preview-frame" title="Widget preview" hidden></iframe>
+            </div>
+        </main>
+
+        <aside class="inspector">
+            <div class="inspector-body">
+                <h3>Customize</h3>
+                <p class="hint" id="inspector-hint">Select a widget to edit its values while you preview it.</p>
+                <form id="inspector-form">
+                    <p class="no-fields">No widget selected.</p>
+                </form>
+            </div>
+            <div class="inspector-actions">
+                <button class="btn btn-primary" id="copy-btn" type="button" disabled>
+                    <i class="fas fa-link"></i> Copy link
+                </button>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        const SECTIONS = [
+            {
+                title: 'Santa',
+                icon: 'fa-sleigh',
+                widgets: [
+                    { id: 'countdown', file: 'countdown.html', title: 'Santa Countdown', desc: 'Festive countdown to Santa takeoff.', icon: 'fa-hourglass-half', fields: [] },
+                    { id: 'route', file: 'route.html', title: 'Santa Route Status', desc: 'Current stop, next stop and time left.', icon: 'fa-map-marked-alt', fields: [] }
+                ]
+            },
+            {
+                title: 'Santa Tracking',
+                icon: 'fa-gift',
+                widgets: [
+                    { id: 'santa-countdown', file: 'santa-countdown.html', title: 'Santa Tracking Countdown', desc: 'Counts down to Christmas Eve (Dec 24, 10:00 UTC).', icon: 'fa-hourglass-half', fields: [] },
+                    { id: 'santa-route', file: 'santa-route.html', title: 'Santa Route', desc: 'Live delivery status along the route.', icon: 'fa-map-marked-alt', fields: [] },
+                    { id: 'santa-route-wide', file: 'santa-route-wide.html', title: 'Santa Route Wide', desc: 'Same live route in a short wide layout (800×280).', icon: 'fa-panorama', fields: [] },
+                    { id: 'journey-end', file: 'journey-end.html', title: 'Until His Journey Ends', desc: 'Counts down until Santa lands back at the North Pole.', icon: 'fa-flag-checkered', fields: [] }
+                ]
+            },
+            {
+                title: 'New Year',
+                icon: 'fa-glass-cheers',
+                widgets: [
+                    { id: 'ny-countdown', file: 'ny-countdown.html', title: 'Next Midnight Countdown', desc: 'Counts down to the nearest timezone midnight.', icon: 'fa-clock', fields: [] },
+                    { id: 'ny-schedule', file: 'ny-schedule.html', title: 'Incoming New Years (Large)', desc: 'Detailed cards for the next 3 zones.', icon: 'fa-list-ul', fields: [] },
+                    { id: 'ny-schedule-compact', file: 'ny-schedule-compact.html', title: 'Incoming New Years (Compact)', desc: 'Small list of upcoming zones.', icon: 'fa-compress-alt', fields: [] },
+                    { id: 'ny-toast', file: 'ny-toast.html', title: 'Celebration Toast', desc: 'Pop-up for the current New Year.', icon: 'fa-glass-martini-alt', fields: [] },
+                    { id: 'ny-facts', file: 'ny-facts.html', title: 'New Year Facts', desc: 'Rotating fun facts every 20 seconds.', icon: 'fa-lightbulb', fields: [] }
+                ]
+            },
+            {
+                title: 'Events',
+                icon: 'fa-calendar-star',
+                widgets: [
+                    {
+                        id: 'event-schedule', file: 'event-schedule.html', title: 'Incoming Event (Large)', desc: 'Detailed cards for the next 3 zones when your date arrives worldwide.', icon: 'fa-list-ul',
+                        hint: 'The event starts at this date and time in every timezone, one after another around the world — same idea as Incoming New Years.',
+                        fields: [
+                            { key: 'title', label: 'Title', placeholder: 'Launch Day', value: 'Launch Day' },
+                            { key: 'date', label: 'Date', type: 'date' },
+                            { key: 'time', label: 'Time in each timezone', type: 'time', value: '00:00' }
+                        ]
+                    },
+                    {
+                        id: 'event-schedule-compact', file: 'event-schedule-compact.html', title: 'Incoming Event (Compact)', desc: 'Small list of upcoming zones for your custom date.', icon: 'fa-compress-alt',
+                        hint: 'The event starts at this date and time in every timezone, one after another around the world — same idea as Incoming New Years.',
+                        fields: [
+                            { key: 'title', label: 'Title', placeholder: 'Launch Day', value: 'Launch Day' },
+                            { key: 'date', label: 'Date', type: 'date' },
+                            { key: 'time', label: 'Time in each timezone', type: 'time', value: '00:00' }
+                        ]
+                    }
+                ]
+            },
+            {
+                title: 'Chat',
+                icon: 'fa-comments',
+                widgets: [
+                    {
+                        id: 'chat-effects', file: 'chat-effects.html', title: 'Onscreen Effects', desc: 'Full-screen transparent FX from chat: !firework !hearts !confetti !snow and more.', icon: 'fa-wand-magic-sparkles',
+                        hint: 'Add as a Browser Source at your canvas size. Background is transparent. Commands: !firework !confetti !snow !hearts !rain !stars !bubbles !coins !party !hype !lightning !fire !rainbow !santa !gg !clap !explode !flowers !lol !pog !sub',
+                        fields: [
+                            { key: 'videoId', label: 'YouTube Video ID', placeholder: 'cwFdM7uDY3E' },
+                            { key: 'who', label: 'Who can trigger', type: 'select', value: 'everyone', options: [
+                                { value: 'everyone', label: 'Everyone' },
+                                { value: 'mods', label: 'Mods and owner only' }
+                            ] },
+                            { key: 'cooldown', label: 'Cooldown seconds per person', placeholder: '4', value: '4' }
+                        ]
+                    },
+                    {
+                        id: 'chat-status', file: 'chat-status.html', title: 'Chat Status', desc: 'Shows a status. Allowed users change it with !status in chat.', icon: 'fa-info-circle',
+                        hint: 'Type !status followed by the new text. Choose who can change it: stream owner, mods, or a custom username list.',
+                        fields: [
+                            { key: 'videoId', label: 'YouTube Video ID', placeholder: 'cwFdM7uDY3E' },
+                            { key: 'who', label: 'Who can change it', type: 'select', value: 'mods', options: [
+                                { value: 'owner', label: 'Owner' },
+                                { value: 'mods', label: 'Mods (and owner)' },
+                                { value: 'custom', label: 'Custom usernames' }
+                            ] },
+                            { key: 'usernames', label: 'Custom usernames (comma or new line)', placeholder: '@Logise, SomeoneElse', type: 'textarea', showWhen: { key: 'who', value: 'custom' } },
+                            { key: 'command', label: 'Command', placeholder: '!status', value: '!status' },
+                            { key: 'text', label: 'Starting status', placeholder: 'Waiting...', value: 'Waiting...' }
+                        ]
+                    },
+                    {
+                        id: 'chat-overlay', file: 'chat-overlay.html', title: 'Chat Overlay', desc: 'Live YouTube chat with avatars and mod badges.', icon: 'fa-comments',
+                        hint: 'Paste the Video ID of the livestream. Votes and chat come from ytstats WebSocket.',
+                        fields: [
+                            { key: 'videoId', label: 'YouTube Video ID', placeholder: 'cwFdM7uDY3E' },
+                            { key: 'max', label: 'Max messages on screen', placeholder: '12', value: '12' }
+                        ]
+                    },
+                    {
+                        id: 'chat-poll', file: 'chat-poll.html', title: 'Chat Poll', desc: 'Viewers vote by typing 1, 2, 3 or 4.', icon: 'fa-poll',
+                        hint: 'Viewers can change their vote. Type 0 to remove it.',
+                        fields: [
+                            { key: 'videoId', label: 'YouTube Video ID', placeholder: 'cwFdM7uDY3E' },
+                            { key: 'question', label: 'Question', placeholder: 'Chat Poll', value: 'Chat Poll' },
+                            { key: 'option1', label: 'Option 1', placeholder: 'Yes', value: 'Yes' },
+                            { key: 'option2', label: 'Option 2', placeholder: 'No', value: 'No' },
+                            { key: 'option3', label: 'Option 3 (optional)', placeholder: '', required: false },
+                            { key: 'option4', label: 'Option 4 (optional)', placeholder: '', required: false }
+                        ]
+                    },
+                    {
+                        id: 'chat-latest', file: 'chat-latest.html', title: 'Latest Message', desc: 'Big popup of the most recent chat line.', icon: 'fa-bolt',
+                        fields: [{ key: 'videoId', label: 'YouTube Video ID', placeholder: 'cwFdM7uDY3E' }]
+                    },
+                    {
+                        id: 'chat-avatars', file: 'chat-avatars.html', title: 'Recent Chatters', desc: 'Avatar row of people who just talked.', icon: 'fa-users',
+                        fields: [
+                            { key: 'videoId', label: 'YouTube Video ID', placeholder: 'cwFdM7uDY3E' },
+                            { key: 'max', label: 'Max avatars', placeholder: '10', value: '10' }
+                        ]
+                    },
+                    {
+                        id: 'chat-highlight', file: 'chat-highlight.html', title: 'Keyword Highlight', desc: 'Pops up when someone says a word you choose.', icon: 'fa-highlighter',
+                        fields: [
+                            { key: 'videoId', label: 'YouTube Video ID', placeholder: 'cwFdM7uDY3E' },
+                            { key: 'keyword', label: 'Keyword', placeholder: 'santa', value: 'santa' }
+                        ]
+                    },
+                    {
+                        id: 'chat-giveaway', file: 'chat-giveaway.html', title: 'Giveaway', desc: 'Viewers type !enter. Mods type !draw to pick a winner.', icon: 'fa-gift',
+                        fields: [
+                            { key: 'videoId', label: 'YouTube Video ID', placeholder: 'cwFdM7uDY3E' },
+                            { key: 'command', label: 'Join command', placeholder: '!enter', value: '!enter' },
+                            { key: 'draw', label: 'Draw command (mods/owner)', placeholder: '!draw', value: '!draw' }
+                        ]
+                    },
+                    {
+                        id: 'chat-top', file: 'chat-top.html', title: 'Top Chatters', desc: 'Leaderboard of who talks the most.', icon: 'fa-trophy',
+                        fields: [
+                            { key: 'videoId', label: 'YouTube Video ID', placeholder: 'cwFdM7uDY3E' },
+                            { key: 'max', label: 'People to show', placeholder: '5', value: '5' }
+                        ]
+                    },
+                    {
+                        id: 'chat-paid', file: 'chat-paid.html', title: 'Paid Messages', desc: 'Alert for Super Chats / messages with an amount.', icon: 'fa-coins',
+                        fields: [{ key: 'videoId', label: 'YouTube Video ID', placeholder: 'cwFdM7uDY3E' }]
+                    },
+                    {
+                        id: 'chat-qa', file: 'chat-qa.html', title: 'Q&A Board', desc: 'Collects questions that start with !q.', icon: 'fa-circle-question',
+                        fields: [
+                            { key: 'videoId', label: 'YouTube Video ID', placeholder: 'cwFdM7uDY3E' },
+                            { key: 'prefix', label: 'Question prefix', placeholder: '!q', value: '!q' }
+                        ]
+                    },
+                    {
+                        id: 'chat-activity', file: 'chat-activity.html', title: 'Chat Activity', desc: 'Messages per minute meter.', icon: 'fa-wave-square',
+                        fields: [{ key: 'videoId', label: 'YouTube Video ID', placeholder: 'cwFdM7uDY3E' }]
+                    }
+                ]
+            },
+            {
+                title: 'Stream',
+                icon: 'fa-video',
+                widgets: [
+                    {
+                        id: 'subgoal', file: 'subgoal.html', title: 'Subscriber Goal', desc: 'Progress bar that celebrates every N subscribers.', icon: 'fa-tasks',
+                        hint: 'Type the channel name, then pick the matching result.',
+                        fields: [
+                            { key: 'channelId', type: 'channel', label: 'Channel name', placeholder: 'Type a channel name' },
+                            { key: 'step', label: 'Goal step (every N subs)', placeholder: '50', value: '50' }
+                        ]
+                    },
+                    {
+                        id: 'social', file: 'social.html', title: 'Social Rotator', desc: 'Rotates YouTube and Discord messages.', icon: 'fa-sync-alt',
+                        fields: [
+                            { key: 'youtube', label: 'YouTube text', placeholder: 'Subscribe to MyChannel!', value: 'Subscribe!' },
+                            { key: 'discord', label: 'Discord text', placeholder: 'Join our Discord!', value: 'Join our Discord!' }
+                        ]
+                    },
+                    {
+                        id: 'latest', file: 'latest.html', title: 'Latest Video', desc: 'Shows the channel\'s most recent upload.', icon: 'fa-youtube', iconFamily: 'fab',
+                        hint: 'Type the channel name, then pick the matching result.',
+                        fields: [{ key: 'channelId', type: 'channel', label: 'Channel name', placeholder: 'Type a channel name' }]
+                    },
+                    {
+                        id: 'views', file: 'views.html', title: 'Total Views', desc: 'Total channel view counter.', icon: 'fa-eye',
+                        hint: 'Type the channel name, then pick the matching result.',
+                        fields: [{ key: 'channelId', type: 'channel', label: 'Channel name', placeholder: 'Type a channel name' }]
+                    },
+                    {
+                        id: 'marquee', file: 'marquee.html', title: 'Scrolling Text', desc: 'Bottom bar with a looping announcement.', icon: 'fa-comment-dots',
+                        hint: 'Customize colors, font, speed, and whether the text loops.',
+                        fields: [
+                            { key: 'text', label: 'Text', placeholder: 'Welcome to the stream! • Subscribe!', type: 'textarea', value: 'Welcome to the Stream! • Subscribe!' },
+                            { key: 'textColor', label: 'Text color', type: 'color', value: '#ffffff' },
+                            { key: 'bgColor', label: 'Background color', type: 'color', value: '#D42426' },
+                            { key: 'borderColor', label: 'Border color', type: 'color', value: '#FFD700' },
+                            { key: 'font', label: 'Font', type: 'select', value: 'outfit', options: [
+                                { value: 'outfit', label: 'Outfit' },
+                                { value: 'lobster', label: 'Lobster' },
+                                { value: 'montserrat', label: 'Montserrat' },
+                                { value: 'bebas', label: 'Bebas Neue' },
+                                { value: 'pacifico', label: 'Pacifico' },
+                                { value: 'rubik', label: 'Rubik' }
+                            ] },
+                            { key: 'speed', label: 'Speed', type: 'select', value: 'medium', options: [
+                                { value: 'slow', label: 'Slow' },
+                                { value: 'medium', label: 'Medium' },
+                                { value: 'fast', label: 'Fast' },
+                                { value: 'turbo', label: 'Very fast' }
+                            ] },
+                            { key: 'repeat', label: 'Repeat', type: 'select', value: 'yes', options: [
+                                { value: 'yes', label: 'Loop forever' },
+                                { value: 'no', label: 'Scroll once' }
+                            ] }
+                        ]
+                    },
+                    {
+                        id: 'stream', file: 'stream.html', title: 'Live Stream Stats', desc: 'Live viewers, likes, and viewer goal.', icon: 'fa-video',
+                        hint: 'Use the Video ID of the livestream (the part after v= in the YouTube URL).',
+                        fields: [{ key: 'videoId', label: 'YouTube Video ID', placeholder: 'dQw4w9WgXcQ' }]
+                    },
+                    {
+                        id: 'datetime', file: 'datetime.html', title: 'Date & Time', desc: 'Current date and time.', icon: 'fa-clock',
+                        fields: [
+                            { key: 'timezone', label: 'Timezone', type: 'timezone', value: 'Europe/London' },
+                            { key: 'label', label: 'Label under the clock', placeholder: 'Current UK Time', value: 'Current UK Time' }
+                        ]
+                    },
+                    {
+                        id: 'custom-countdown', file: 'custom-countdown.html', title: 'Custom Countdown', desc: 'Fully customizable countdown.', icon: 'fa-hourglass-start',
+                        fields: [
+                            { key: 'text', label: 'Top text', placeholder: 'Event Starts In', value: 'Event Starts In' },
+                            { key: 'size', label: 'Size', type: 'select', value: 'medium', options: [
+                                { value: 'small', label: 'Small' },
+                                { value: 'medium', label: 'Medium' },
+                                { value: 'large', label: 'Large' }
+                            ] },
+                            { key: 'date', label: 'Target date and time', type: 'datetime-local' }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        const nav = document.getElementById('sidebar-nav');
+        const form = document.getElementById('inspector-form');
+        const hintEl = document.getElementById('inspector-hint');
+        const titleEl = document.getElementById('widget-title');
+        const descEl = document.getElementById('widget-desc');
+        const frame = document.getElementById('preview-frame');
+        const empty = document.getElementById('preview-empty');
+        const copyBtn = document.getElementById('copy-btn');
+
+        let active = null;
+        let previewTimer = null;
+        let searchTimer = null;
+        let searchToken = 0;
+
+        function allWidgets() {
+            return SECTIONS.flatMap((section) => section.widgets);
+        }
+
+        function widgetUrl(widget, params = {}) {
+            const base = new URL('widgets/' + widget.file, window.location.href).href;
+            const search = new URLSearchParams();
+            Object.entries(params).forEach(([key, value]) => {
+                if (value !== undefined && value !== '') search.set(key, value);
+            });
+            const qs = search.toString();
+            return qs ? `${base}?${qs}` : base;
+        }
+
+        function collectParams() {
+            const params = {};
+            form.querySelectorAll('[name]').forEach((el) => {
+                const field = active?.fields.find((item) => item.key === el.name);
+                if (field && !fieldVisible(field)) return;
+                params[el.name] = el.value;
+            });
+            return params;
+        }
+
+        function fieldVisible(field) {
+            if (!field.showWhen) return true;
+            const dep = form.querySelector(`[name="${field.showWhen.key}"]`);
+            return !!(dep && dep.value === field.showWhen.value);
+        }
+
+        function missingRequired() {
+            if (!active) return true;
+            return active.fields.some((field) => {
+                if (!fieldVisible(field)) return false;
+                const el = form.querySelector(`[name="${field.key}"]`);
+                return el && el.required && !el.value.trim();
+            });
+        }
+
+        function syncFieldVisibility() {
+            if (!active) return;
+            active.fields.forEach((field) => {
+                const el = form.querySelector(`[name="${field.key}"]`);
+                if (!el) return;
+                const visible = fieldVisible(field);
+                const label = el.previousElementSibling;
+                el.style.display = visible ? '' : 'none';
+                if (label && label.tagName === 'LABEL') label.style.display = visible ? '' : 'none';
+            });
+        }
+
+        function updatePreview() {
+            if (!active) return;
+            if (missingRequired()) {
+                frame.hidden = true;
+                empty.hidden = false;
+                empty.innerHTML = '<i class="fas fa-pen"></i><strong>Missing details</strong><p>Fill in the fields on the right to see the preview.</p>';
+                return;
+            }
+            empty.hidden = true;
+            frame.hidden = false;
+            frame.src = widgetUrl(active, collectParams());
+        }
+
+        function schedulePreview() {
+            clearTimeout(previewTimer);
+            previewTimer = setTimeout(updatePreview, 350);
+        }
+
+        function timezoneOptions() {
+            const zones = (typeof Intl !== 'undefined' && Intl.supportedValuesOf)
+                ? Intl.supportedValuesOf('timeZone')
+                : ['UTC', 'Europe/London', 'Europe/Madrid', 'Europe/Paris', 'America/New_York', 'America/Los_Angeles', 'America/Mexico_City', 'America/Sao_Paulo', 'Asia/Tokyo', 'Asia/Shanghai', 'Australia/Sydney'];
+            return zones.map((zone) => ({
+                value: zone,
+                label: zone.replace(/_/g, ' ')
+            }));
+        }
+
+        function buildField(field) {
+            if (field.type === 'channel') {
+                buildChannelField(field);
+                return;
+            }
+
+            const label = document.createElement('label');
+            label.textContent = field.label;
+            form.appendChild(label);
+
+            let input;
+            if (field.type === 'textarea') {
+                input = document.createElement('textarea');
+                input.rows = 4;
+            } else if (field.type === 'select' || field.type === 'timezone') {
+                input = document.createElement('select');
+                const options = field.type === 'timezone'
+                    ? timezoneOptions()
+                    : (field.options || []);
+                options.forEach((opt) => {
+                    const option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.label;
+                    input.appendChild(option);
+                });
+            } else {
+                input = document.createElement('input');
+                input.type = field.type || 'text';
+            }
+            input.name = field.key;
+            input.placeholder = field.placeholder || '';
+            input.required = field.required !== false;
+            if (field.value) input.value = field.value;
+            if ((field.type === 'datetime-local' || field.type === 'date') && !input.value) {
+                const initDate = new Date();
+                initDate.setDate(initDate.getDate() + 1);
+                initDate.setMinutes(initDate.getMinutes() - initDate.getTimezoneOffset());
+                input.value = field.type === 'date'
+                    ? initDate.toISOString().slice(0, 10)
+                    : initDate.toISOString().slice(0, 16);
+            }
+            input.addEventListener('input', () => {
+                syncFieldVisibility();
+                schedulePreview();
+            });
+            input.addEventListener('change', () => {
+                syncFieldVisibility();
+                schedulePreview();
+            });
+            form.appendChild(input);
+        }
+
+        function buildChannelField(field) {
+            const label = document.createElement('label');
+            label.textContent = field.label;
+            form.appendChild(label);
+
+            const search = document.createElement('input');
+            search.type = 'search';
+            search.placeholder = field.placeholder || 'Type a channel name';
+            search.autocomplete = 'off';
+            form.appendChild(search);
+
+            const hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = field.key;
+            hidden.required = true;
+            form.appendChild(hidden);
+
+            const status = document.createElement('p');
+            status.className = 'channel-status';
+            status.textContent = 'Start typing a channel name.';
+            form.appendChild(status);
+
+            const results = document.createElement('div');
+            results.className = 'channel-results';
+            form.appendChild(results);
+
+            const avatarImg = (src) => {
+                const img = document.createElement('img');
+                img.alt = '';
+                img.referrerPolicy = 'no-referrer';
+                img.loading = 'lazy';
+                img.src = src || '';
+                return img;
+            };
+
+            const pickChannel = (name, id, thumb) => {
+                hidden.value = id;
+                search.value = name;
+                status.textContent = 'Selected: ' + name;
+                results.innerHTML = '';
+                const chosen = document.createElement('button');
+                chosen.type = 'button';
+                chosen.className = 'channel-result selected';
+                const nameEl = document.createElement('span');
+                nameEl.textContent = name;
+                chosen.appendChild(avatarImg(thumb));
+                chosen.appendChild(nameEl);
+                results.appendChild(chosen);
+                schedulePreview();
+            };
+
+            const renderResults = (list) => {
+                results.innerHTML = '';
+                if (!list.length) {
+                    status.textContent = 'No channels found.';
+                    return;
+                }
+                status.textContent = 'Pick a channel:';
+                list.slice(0, 12).forEach((item) => {
+                    const name = item[0] || 'Unknown';
+                    const thumb = item[1] || '';
+                    const id = item[2] || '';
+                    if (!id) return;
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'channel-result';
+                    const nameEl = document.createElement('span');
+                    nameEl.textContent = name;
+                    btn.appendChild(avatarImg(thumb));
+                    btn.appendChild(nameEl);
+                    btn.addEventListener('click', () => pickChannel(name, id, thumb));
+                    results.appendChild(btn);
+                });
+            };
+
+            search.addEventListener('input', () => {
+                const query = search.value.trim();
+                hidden.value = '';
+                clearTimeout(searchTimer);
+                if (query.length < 2) {
+                    results.innerHTML = '';
+                    status.textContent = 'Type at least 2 characters.';
+                    schedulePreview();
+                    return;
+                }
+                status.textContent = 'Searching...';
+                const token = ++searchToken;
+                searchTimer = setTimeout(async () => {
+                    try {
+                        const res = await fetch(`https://mixerno.space/api/youtube-channel-counter/search/${encodeURIComponent(query)}`);
+                        const data = await res.json();
+                        if (token !== searchToken) return;
+                        renderResults(Array.isArray(data?.list) ? data.list : []);
+                    } catch (err) {
+                        if (token !== searchToken) return;
+                        results.innerHTML = '';
+                        status.textContent = 'Search failed. Try again.';
+                        console.error(err);
+                    }
+                }, 350);
+            });
+        }
+
+        function selectWidget(id) {
+            const widget = allWidgets().find((item) => item.id === id);
+            if (!widget) return;
+            active = widget;
+
+            document.querySelectorAll('.nav-item').forEach((btn) => {
+                btn.classList.toggle('active', btn.dataset.widget === id);
+            });
+
+            titleEl.textContent = widget.title;
+            descEl.textContent = widget.desc;
+            hintEl.textContent = widget.hint || 'Changes show instantly in the preview.';
+            form.innerHTML = '';
+
+            if (!widget.fields.length) {
+                form.innerHTML = '<p class="no-fields">This widget does not need extra setup.</p>';
+            } else {
+                widget.fields.forEach(buildField);
+                syncFieldVisibility();
+            }
+
+            copyBtn.disabled = false;
+            updatePreview();
+        }
+
+        SECTIONS.forEach((section) => {
+            const heading = document.createElement('div');
+            heading.className = 'nav-section';
+            heading.innerHTML = `<i class="fas ${section.icon}"></i> ${section.title}`;
+            nav.appendChild(heading);
+            section.widgets.forEach((widget) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'nav-item';
+                btn.dataset.widget = widget.id;
+                const family = widget.iconFamily || 'fas';
+                btn.innerHTML = `<i class="${family} ${widget.icon}"></i><span>${widget.title}</span>`;
+                btn.addEventListener('click', () => selectWidget(widget.id));
+                nav.appendChild(btn);
+            });
+        });
+
+        copyBtn.addEventListener('click', async () => {
+            if (!active || missingRequired()) return;
+            await navigator.clipboard.writeText(widgetUrl(active, collectParams()));
+            const original = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied';
+            copyBtn.classList.add('copied');
+            setTimeout(() => {
+                copyBtn.innerHTML = original;
+                copyBtn.classList.remove('copied');
+            }, 1800);
+        });
+    </script>
+</body>
+
+</html>
