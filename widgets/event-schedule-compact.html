@@ -75,7 +75,9 @@
     <script src="../js/newyear.js"></script>
     <script>
         const eventTitle = qs('title', 'The Event');
-        const eventDate = qs('date');
+        const tomorrow = new Date(getNow());
+        tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
+        const eventDate = qs('date', tomorrow.toISOString().slice(0, 10));
         const eventTime = qs('time', '00:00');
         document.getElementById('event-heading').innerText = eventTitle;
         document.getElementById('ny-overlay-title').innerText = eventTitle;
