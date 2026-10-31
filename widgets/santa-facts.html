@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santa Location Facts</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/shared.css">
+    <style>
+        .w-santa-facts {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            padding: 1.6rem;
+            border-radius: 20px;
+            border: 3px solid #e63946;
+            width: 500px;
+        }
+        .w-santa-facts h3 {
+            color: #ffd700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #city {
+            font-size: 1.45rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+        #fact {
+            font-size: 1.05rem;
+            line-height: 1.45;
+            min-height: 4.2em;
+            color: #e2e8f0;
+        }
+    </style>
+</head>
+<body class="obs-mode">
+    <div class="obs-widget w-santa-facts">
+        <h3><i class="fas fa-lightbulb"></i> About this stop</h3>
+        <div id="city">Loading...</div>
+        <p id="fact"></p>
+    </div>
+    <script src="../js/obs.js"></script>
+    <script src="../js/santa.js"></script>
+    <script>
+        async function start() {
+            const route = await loadSantaRoute();
+            function tick() {
+                const state = santaState(route);
+                const stop = state.phase === 'pre' ? route[0] : (state.current || route[route.length - 1]);
+                document.getElementById('city').innerText = santaLocName(stop);
+                document.getElementById('fact').innerText = santaClipFact(stop.wikipedia_summary);
+            }
+            setInterval(tick, 2000);
+            tick();
+        }
+        start().catch((err) => console.error(err));
+    </script>
+</body>
+</html>

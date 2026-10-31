@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santa Journey Progress</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/shared.css">
+    <style>
+        .w-santa-progress {
+            width: 480px;
+            background: #0f172a;
+            color: #fff;
+            border: 3px solid #e63946;
+            border-radius: 20px;
+            padding: 20px 22px;
+            box-shadow: 0 10px 32px rgba(0,0,0,0.35);
+        }
+        .head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .head h2 { font-size: 1.25rem; }
+        .head span { color: #ffd700; font-weight: 800; }
+        .bar {
+            height: 16px; background: rgba(255,255,255,0.08); border-radius: 99px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+        .fill {
+            height: 100%; width: 0;
+            background: linear-gradient(90deg, #e63946, #ffd700);
+            transition: width 0.6s ease;
+        }
+        .stats {
+            margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; text-align: center;
+        }
+        .stat { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 6px; }
+        .stat b { display: block; font-size: 1.15rem; }
+        .stat small { color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; font-size: 0.7rem; }
+        .eta { margin-top: 12px; color: #cbd5e1; font-weight: 700; text-align: center; }
+    </style>
+</head>
+<body class="obs-mode">
+    <div class="obs-widget w-santa-progress">
+        <div class="head">
+            <h2><i class="fas fa-route"></i> Santa's Journey</h2>
+            <span id="pct">0%</span>
+        </div>
+        <div class="bar"><div id="fill" class="fill"></div></div>
+        <div class="stats">
+            <div class="stat"><b id="stops">0 / 0</b><small>Stops</small></div>
+            <div class="stat"><b id="km">0</b><small>Km flown</small></div>
+            <div class="stat"><b id="left">0</b><small>Stops left</small></div>
+        </div>
+        <div class="eta" id="eta">Waiting for takeoff</div>
+    </div>
+    <script src="../js/obs.js"></script>
+    <script src="../js/santa.js"></script>
+    <script>
+        async function start() {
+            const route = await loadSantaRoute();
+            function tick() {
+                const state = santaState(route);
+                const pct = Math.round(state.progress * 100);
+                document.getElementById('pct').innerText = pct + '%';
+                document.getElementById('fill').style.width = (state.progress * 100) + '%';
+                document.getElementById('stops').innerText = `${state.visited} / ${state.total}`;
+                document.getElementById('km').innerText = santaFormatNumber(state.kmFlown);
+                document.getElementById('left').innerText = state.remaining;
+                const eta = document.getElementById('eta');
+                if (state.phase === 'pre') eta.innerText = 'Takeoff in ' + santaFormatDuration(state.takeoff - getNow());
+                else if (state.phase === 'done') eta.innerText = 'Santa is back at the North Pole';
+                else eta.innerText = 'Lands in ' + santaFormatDuration(state.landing - getNow());
+            }
+            setInterval(tick, 1000);
+            tick();
+        }
+        start().catch((err) => console.error(err));
+    </script>
+</body>
+</html>

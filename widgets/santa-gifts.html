@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gifts Delivered</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/shared.css">
+    <style>
+        .w-santa-gifts {
+            min-width: 380px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border: 4px solid #ffd700;
+            border-radius: 22px;
+            padding: 22px 28px;
+            text-align: center;
+            color: #fff;
+            box-shadow: 0 0 36px rgba(255, 215, 0, 0.18);
+        }
+        .w-santa-gifts i { color: #e63946; font-size: 2rem; margin-bottom: 8px; }
+        .w-santa-gifts h2 {
+            font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase;
+            color: #ffd700; margin-bottom: 8px;
+        }
+        #gifts {
+            font-family: var(--font-heading);
+            font-size: 3.2rem;
+            line-height: 1;
+            text-shadow: 0 3px 0 #e63946;
+        }
+        .sub { margin-top: 10px; color: #94a3b8; font-weight: 700; }
+    </style>
+</head>
+<body class="obs-mode">
+    <div class="obs-widget w-santa-gifts">
+        <i class="fas fa-gift"></i>
+        <h2>Gifts Delivered</h2>
+        <div id="gifts">0</div>
+        <div class="sub" id="sub">Workshop packing...</div>
+    </div>
+    <script src="../js/obs.js"></script>
+    <script src="../js/santa.js"></script>
+    <script>
+        async function start() {
+            const route = await loadSantaRoute();
+            function tick() {
+                const state = santaState(route);
+                document.getElementById('gifts').innerText = santaFormatNumber(state.gifts);
+                const sub = document.getElementById('sub');
+                if (state.phase === 'pre') sub.innerText = 'Workshop packing...';
+                else if (state.phase === 'done') sub.innerText = 'Every gift is under a tree';
+                else sub.innerText = 'Around the world and counting';
+            }
+            setInterval(tick, 250);
+            tick();
+        }
+        start().catch((err) => console.error(err));
+    </script>
+</body>
+</html>

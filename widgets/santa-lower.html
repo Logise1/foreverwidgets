@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santa Lower Third</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/shared.css">
+    <style>
+        .w-santa-lower {
+            width: 920px;
+            height: 72px;
+            background: #0f172a;
+            border: 3px solid #e63946;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            color: #fff;
+            box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+        }
+        .badge {
+            background: #e63946;
+            height: 100%;
+            min-width: 86px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+        .cols {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr auto;
+            gap: 16px;
+            padding: 0 18px;
+            align-items: center;
+        }
+        .cols small {
+            display: block;
+            font-size: 0.68rem;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            color: #94a3b8;
+            font-weight: 800;
+        }
+        .cols b { font-size: 1.25rem; line-height: 1.15; }
+        .timer { color: #ffd700; font-variant-numeric: tabular-nums; min-width: 110px; text-align: right; }
+    </style>
+</head>
+<body class="obs-mode">
+    <div class="obs-widget w-santa-lower">
+        <div class="badge"><i class="fas fa-sleigh"></i></div>
+        <div class="cols">
+            <div><small id="now-label">Now</small><b id="now-city">---</b></div>
+            <div><small>Next</small><b id="next-city">---</b></div>
+            <div class="timer"><small>Arrives in</small><b id="timer">--:--</b></div>
+        </div>
+    </div>
+    <script src="../js/obs.js"></script>
+    <script src="../js/santa.js"></script>
+    <script>
+        async function start() {
+            const route = await loadSantaRoute();
+            function tick() {
+                const state = santaState(route);
+                const nowLabel = document.getElementById('now-label');
+                const nowCity = document.getElementById('now-city');
+                const nextCity = document.getElementById('next-city');
+                const timer = document.getElementById('timer');
+                if (state.phase === 'pre') {
+                    nowLabel.innerText = 'Preparing';
+                    nowCity.innerText = "Santa's Village";
+                    nextCity.innerText = state.next ? state.next.city : 'Takeoff';
+                    timer.innerText = santaFormatDuration(state.takeoff - getNow());
+                    return;
+                }
+                if (state.phase === 'done') {
+                    nowLabel.innerText = 'Home';
+                    nowCity.innerText = "Santa's Village";
+                    nextCity.innerText = 'Journey complete';
+                    timer.innerText = '00:00';
+                    return;
+                }
+                nowLabel.innerText = 'Now in';
+                nowCity.innerText = state.current.city;
+                nextCity.innerText = state.next ? state.next.city : 'Home';
+                timer.innerText = state.next ? santaFormatDuration(state.next.arrival - getNow()) : 'Done';
+            }
+            setInterval(tick, 1000);
+            tick();
+        }
+        start().catch((err) => console.error(err));
+    </script>
+</body>
+</html>

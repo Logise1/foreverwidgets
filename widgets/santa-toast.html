@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santa Arrival Toast</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/shared.css">
+    <style>
+        .w-santa-toast {
+            background: rgba(15, 23, 42, 0.95);
+            border: 3px solid #e63946;
+            border-radius: 20px;
+            padding: 18px 32px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: white;
+            box-shadow: 0 0 40px rgba(230, 57, 70, 0.35);
+            min-width: 460px;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .w-santa-toast.show { transform: translateY(0); opacity: 1; }
+        .w-santa-toast.arriving { border-color: #ffd700; box-shadow: 0 0 50px rgba(255, 215, 0, 0.4); }
+        .toast-icon { font-size: 3.4rem; color: #e63946; }
+        .w-santa-toast.arriving .toast-icon { color: #ffd700; }
+        .toast-content { display: flex; flex-direction: column; gap: 4px; }
+        .toast-content h2 {
+            margin: 0; font-size: 1.15rem; letter-spacing: 2px; text-transform: uppercase;
+            color: #94a3b8; font-weight: 800;
+        }
+        .w-santa-toast.arriving .toast-content h2 { color: #ffd700; }
+        .toast-content p {
+            margin: 0; font-size: 2rem; font-weight: 800; line-height: 1.1; color: #fff;
+        }
+        .toast-content span { color: #94a3b8; font-weight: 700; font-size: 0.95rem; }
+    </style>
+</head>
+<body class="obs-mode">
+    <div id="toast" class="obs-widget w-santa-toast">
+        <div class="toast-icon"><i class="fas fa-sleigh"></i></div>
+        <div class="toast-content">
+            <h2 id="toast-label">UP NEXT</h2>
+            <p id="toast-city">Loading...</p>
+            <span id="toast-sub"></span>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="../js/obs.js"></script>
+    <script src="../js/santa.js"></script>
+    <script>
+        const toast = document.getElementById('toast');
+        const labelEl = document.getElementById('toast-label');
+        const cityEl = document.getElementById('toast-city');
+        const subEl = document.getElementById('toast-sub');
+        const celebrated = new Set();
+        toast.classList.add('show');
+
+        async function start() {
+            const route = await loadSantaRoute();
+            function tick() {
+                const state = santaState(route);
+                toast.classList.toggle('arriving', false);
+                if (state.phase === 'pre') {
+                    labelEl.innerText = 'WAITING AT THE POLE';
+                    cityEl.innerText = "Santa's Village";
+                    subEl.innerText = 'Takeoff in ' + santaFormatDuration(state.takeoff - getNow());
+                    return;
+                }
+                if (state.phase === 'done') {
+                    labelEl.innerText = 'JOURNEY COMPLETE';
+                    cityEl.innerText = 'Back home';
+                    subEl.innerText = 'All gifts delivered';
+                    return;
+                }
+                const justArrived = state.current && (getNow() - state.current.arrival) < 8000;
+                if (justArrived) {
+                    toast.classList.add('arriving');
+                    labelEl.innerText = 'NOW ARRIVING';
+                    cityEl.innerText = state.current.city;
+                    subEl.innerText = state.current.region || '';
+                    if (!celebrated.has(state.current.id) && window.confetti) {
+                        celebrated.add(state.current.id);
+                        confetti({ particleCount: 120, spread: 80, origin: { y: 0.8 }, colors: ['#e63946', '#ffd700', '#ffffff'] });
+                    }
+                    return;
+                }
+                if (state.next) {
+                    labelEl.innerText = 'UP NEXT';
+                    cityEl.innerText = state.next.city;
+                    subEl.innerText = 'Arrives in ' + santaFormatDuration(state.next.arrival - getNow());
+                }
+            }
+            setInterval(tick, 1000);
+            tick();
+        }
+        start().catch((err) => console.error(err));
+    </script>
+</body>
+</html>

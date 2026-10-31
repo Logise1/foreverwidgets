@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>When Santa Visits You</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Outfit:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/shared.css">
+    <style>
+        .w-santa-city { text-align: center; min-width: 520px; }
+        .w-santa-city h2 {
+            font-family: var(--font-heading);
+            color: white;
+            text-shadow: 2px 2px 0 #e63946, 4px 4px 0 rgba(0,0,0,0.2);
+            font-size: 2.6rem;
+            margin-bottom: 1.1rem;
+        }
+        .boxes { display: flex; justify-content: center; gap: 12px; }
+        .time-box {
+            background: rgba(255,255,255,0.95);
+            padding: 1.1rem 1.2rem;
+            min-width: 92px;
+            border-radius: 15px;
+            box-shadow: 0 8px 0 #ffebee;
+            border: 2px solid #ffebee;
+        }
+        .time-box span {
+            font-size: 2.6rem;
+            color: #e63946;
+            font-weight: 800;
+            display: block;
+            font-family: 'Lobster', cursive;
+        }
+        .time-box p { color: #64748b; font-weight: 700; margin-top: 4px; }
+        .status {
+            margin-top: 16px;
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.15rem;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .status.miss { color: #fbbf24; }
+    </style>
+</head>
+<body class="obs-mode">
+    <div class="obs-widget w-santa-city">
+        <h2 id="title">Santa reaches you in</h2>
+        <div class="boxes">
+            <div class="time-box"><span id="d">00</span><p>Days</p></div>
+            <div class="time-box"><span id="h">00</span><p>Hours</p></div>
+            <div class="time-box"><span id="m">00</span><p>Mins</p></div>
+            <div class="time-box"><span id="s">00</span><p>Secs</p></div>
+        </div>
+        <div class="status" id="status"></div>
+    </div>
+    <script src="../js/obs.js"></script>
+    <script src="../js/santa.js"></script>
+    <script>
+        function pad(n) { return n < 10 ? `0${n}` : n; }
+        async function start() {
+            const query = qs('city', 'London');
+            const route = await loadSantaRoute();
+            const stop = santaFindStop(route, query);
+            const title = document.getElementById('title');
+            const status = document.getElementById('status');
+            if (!stop) {
+                title.innerText = 'City not on the route';
+                status.innerText = 'Try another city name';
+                status.classList.add('miss');
+                return;
+            }
+            title.innerText = `Santa reaches ${stop.city} in`;
+            function tick() {
+                const now = getNow();
+                const distance = stop.arrival - now;
+                if (distance <= 0 && distance > -60000) {
+                    title.innerText = `Santa is in ${stop.city}!`;
+                    status.innerText = stop.region || 'Right now';
+                    ['d', 'h', 'm', 's'].forEach((id) => document.getElementById(id).innerText = '00');
+                    return;
+                }
+                if (distance <= 0) {
+                    title.innerText = `Santa already visited ${stop.city}`;
+                    status.innerText = stop.region || '';
+                    ['d', 'h', 'm', 's'].forEach((id) => document.getElementById(id).innerText = '00');
+                    return;
+                }
+                document.getElementById('d').innerText = pad(Math.floor(distance / 86400000));
+                document.getElementById('h').innerText = pad(Math.floor((distance % 86400000) / 3600000));
+                document.getElementById('m').innerText = pad(Math.floor((distance % 3600000) / 60000));
+                document.getElementById('s').innerText = pad(Math.floor((distance % 60000) / 1000));
+                status.innerText = stop.region || '';
+            }
+            setInterval(tick, 1000);
+            tick();
+        }
+        start().catch((err) => console.error(err));
+    </script>
+</body>
+</html>

@@ -79,6 +79,7 @@
         tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
         const eventDate = qs('date', tomorrow.toISOString().slice(0, 10));
         const eventTime = qs('time', '00:00');
+        const maxZones = Math.min(20, Math.max(1, parseInt(qs('count', '12'), 10) || 12));
         document.getElementById('event-heading').innerText = eventTitle;
         document.getElementById('ny-overlay-title').innerText = eventTitle;
         window.celebratedOverlaySet = new Set();
@@ -94,7 +95,7 @@
                 setTimeout(() => overlay.classList.remove('active'), 5000);
             }
             const container = document.getElementById('ny-list-container');
-            const listItems = upcoming.slice(0, 12);
+            const listItems = upcoming.slice(0, maxZones);
             while (container.children.length > listItems.length) container.removeChild(container.lastChild);
             listItems.forEach((item, index) => {
                 const isCelebration = item.diff <= 0;

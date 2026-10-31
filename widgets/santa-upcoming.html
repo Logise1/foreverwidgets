@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upcoming Santa Stops</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/shared.css">
+    <style>
+        .w-santa-list {
+            background: #0f172a;
+            color: white;
+            padding: 15px;
+            border-radius: 20px;
+            border: 2px solid #e63946;
+            width: 320px;
+        }
+        .w-santa-list h3 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #334155;
+            color: #ffd700;
+            text-transform: uppercase;
+        }
+        .item {
+            padding: 8px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .item:first-child {
+            background: rgba(230, 57, 70, 0.22);
+            border: 1px solid rgba(230, 57, 70, 0.5);
+        }
+        .city { font-size: 0.9rem; font-weight: 700; }
+        .city small { display: block; color: #94a3b8; font-size: 0.72rem; font-weight: 600; }
+        .time { font-family: monospace; font-weight: 800; color: #ffd700; white-space: nowrap; }
+    </style>
+</head>
+<body class="obs-mode">
+    <div class="obs-widget w-santa-list">
+        <h3><i class="fas fa-map-marker-alt"></i> Next stops</h3>
+        <div id="list"></div>
+    </div>
+    <script src="../js/obs.js"></script>
+    <script src="../js/santa.js"></script>
+    <script>
+        async function start() {
+            const route = await loadSantaRoute();
+            function tick() {
+                const state = santaState(route);
+                const list = document.getElementById('list');
+                const items = state.upcoming.slice(0, 8);
+                list.innerHTML = '';
+                if (!items.length) {
+                    list.innerHTML = '<div class="item"><div class="city">Journey complete</div></div>';
+                    return;
+                }
+                items.forEach((stop) => {
+                    const row = document.createElement('div');
+                    row.className = 'item';
+                    row.innerHTML = `<div class="city">${stop.city}<small>${stop.region || ''}</small></div><div class="time">${santaFormatDuration(stop.arrival - getNow())}</div>`;
+                    list.appendChild(row);
+                });
+            }
+            setInterval(tick, 1000);
+            tick();
+        }
+        start().catch((err) => console.error(err));
+    </script>
+</body>
+</html>

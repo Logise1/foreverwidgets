@@ -414,7 +414,19 @@
                     { id: 'santa-countdown', file: 'santa-countdown.html', title: 'Santa Tracking Countdown', desc: 'Counts down to Christmas Eve (Dec 24, 10:00 UTC).', icon: 'fa-hourglass-half', fields: [] },
                     { id: 'santa-route', file: 'santa-route.html', title: 'Santa Route', desc: 'Live delivery status along the route.', icon: 'fa-map-marked-alt', fields: [] },
                     { id: 'santa-route-wide', file: 'santa-route-wide.html', title: 'Santa Route Wide', desc: 'Same live route in a short wide layout (800×280).', icon: 'fa-panorama', fields: [] },
-                    { id: 'journey-end', file: 'journey-end.html', title: 'Until His Journey Ends', desc: 'Counts down until Santa lands back at the North Pole.', icon: 'fa-flag-checkered', fields: [] }
+                    { id: 'journey-end', file: 'journey-end.html', title: 'Until His Journey Ends', desc: 'Counts down until Santa lands back at the North Pole.', icon: 'fa-flag-checkered', fields: [] },
+                    { id: 'santa-now', file: 'santa-now.html', title: 'Current Location', desc: 'Big card of the city Santa is in right now.', icon: 'fa-location-dot', fields: [] },
+                    { id: 'santa-lower', file: 'santa-lower.html', title: 'Lower Third', desc: 'Wide bar: now, next stop and time left.', icon: 'fa-window-minimize', fields: [] },
+                    { id: 'santa-toast', file: 'santa-toast.html', title: 'Arrival Toast', desc: 'Pops when Santa arrives, otherwise shows the next stop.', icon: 'fa-bell', fields: [] },
+                    { id: 'santa-upcoming', file: 'santa-upcoming.html', title: 'Upcoming Stops', desc: 'Next 8 cities on the route with timers.', icon: 'fa-list', fields: [] },
+                    { id: 'santa-progress', file: 'santa-progress.html', title: 'Journey Progress', desc: 'Stops done, km flown and time until landing.', icon: 'fa-chart-line', fields: [] },
+                    { id: 'santa-gifts', file: 'santa-gifts.html', title: 'Gifts Delivered', desc: 'Live present counter as Santa flies the route.', icon: 'fa-gift', fields: [] },
+                    {
+                        id: 'santa-city', file: 'santa-city.html', title: 'When Santa Visits You', desc: 'Countdown until Santa reaches a city you pick.', icon: 'fa-house-chimney',
+                        hint: 'Type a city from the route (London, Tokyo, Madrid...) and pick the match.',
+                        fields: [{ key: 'city', type: 'santacity', label: 'Your city', placeholder: 'Type a city on the route', value: 'London' }]
+                    },
+                    { id: 'santa-facts', file: 'santa-facts.html', title: 'Location Facts', desc: 'Short fact about the city Santa is visiting.', icon: 'fa-book-open', fields: [] }
                 ]
             },
             {
@@ -433,21 +445,35 @@
                 icon: 'fa-calendar-star',
                 widgets: [
                     {
-                        id: 'event-schedule', file: 'event-schedule.html', title: 'Incoming Event (Large)', desc: 'Detailed cards for the next 3 zones when your date arrives worldwide.', icon: 'fa-list-ul',
+                        id: 'event-schedule', file: 'event-schedule.html', title: 'Incoming Event (Large)', desc: 'Cards for the next 1–12 zones, packed into a square grid.', icon: 'fa-list-ul',
                         hint: 'The event starts at this date and time in every timezone, one after another around the world — same idea as Incoming New Years.',
                         fields: [
                             { key: 'title', label: 'Title', placeholder: 'Launch Day', value: 'Launch Day' },
                             { key: 'date', label: 'Date', type: 'date' },
-                            { key: 'time', label: 'Time in each timezone', type: 'time', value: '00:00' }
+                            { key: 'time', label: 'Time in each timezone', type: 'time', value: '00:00' },
+                            { key: 'count', label: 'Timezones to show', type: 'select', value: '3', options: [
+                                { value: '1', label: '1' }, { value: '2', label: '2' }, { value: '3', label: '3' },
+                                { value: '4', label: '4' }, { value: '5', label: '5' }, { value: '6', label: '6' },
+                                { value: '7', label: '7' }, { value: '8', label: '8' }, { value: '9', label: '9' },
+                                { value: '10', label: '10' }, { value: '11', label: '11' }, { value: '12', label: '12' }
+                            ] }
                         ]
                     },
                     {
-                        id: 'event-schedule-compact', file: 'event-schedule-compact.html', title: 'Incoming Event (Compact)', desc: 'Small list of upcoming zones for your custom date.', icon: 'fa-compress-alt',
+                        id: 'event-schedule-compact', file: 'event-schedule-compact.html', title: 'Incoming Event (Compact)', desc: 'Small list of upcoming zones. Choose how many to show.', icon: 'fa-compress-alt',
                         hint: 'The event starts at this date and time in every timezone, one after another around the world — same idea as Incoming New Years.',
                         fields: [
                             { key: 'title', label: 'Title', placeholder: 'Launch Day', value: 'Launch Day' },
                             { key: 'date', label: 'Date', type: 'date' },
-                            { key: 'time', label: 'Time in each timezone', type: 'time', value: '00:00' }
+                            { key: 'time', label: 'Time in each timezone', type: 'time', value: '00:00' },
+                            { key: 'count', label: 'Timezones to show', type: 'select', value: '12', options: [
+                                { value: '1', label: '1' }, { value: '2', label: '2' }, { value: '3', label: '3' },
+                                { value: '4', label: '4' }, { value: '5', label: '5' }, { value: '6', label: '6' },
+                                { value: '7', label: '7' }, { value: '8', label: '8' }, { value: '9', label: '9' },
+                                { value: '10', label: '10' }, { value: '11', label: '11' }, { value: '12', label: '12' },
+                                { value: '14', label: '14' }, { value: '16', label: '16' }, { value: '18', label: '18' },
+                                { value: '20', label: '20' }
+                            ] }
                         ]
                     }
                 ]
@@ -736,6 +762,10 @@
                 buildChannelField(field);
                 return;
             }
+            if (field.type === 'santacity') {
+                buildSantaCityField(field);
+                return;
+            }
 
             const label = document.createElement('label');
             label.textContent = field.label;
@@ -781,6 +811,96 @@
                 schedulePreview();
             });
             form.appendChild(input);
+        }
+
+        let santaCityCache = null;
+        async function loadSantaCities() {
+            if (santaCityCache) return santaCityCache;
+            const res = await fetch('route.json');
+            const data = await res.json();
+            santaCityCache = data.map((stop) => ({
+                id: stop.id,
+                city: stop.city,
+                region: stop.region || '',
+                label: stop.region ? `${stop.city}, ${stop.region}` : stop.city
+            }));
+            return santaCityCache;
+        }
+
+        function buildSantaCityField(field) {
+            const label = document.createElement('label');
+            label.textContent = field.label;
+            form.appendChild(label);
+
+            const search = document.createElement('input');
+            search.type = 'search';
+            search.placeholder = field.placeholder || 'Type a city on the route';
+            search.autocomplete = 'off';
+            search.value = field.value || '';
+            form.appendChild(search);
+
+            const hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = field.key;
+            hidden.required = field.required !== false;
+            hidden.value = field.value || '';
+            form.appendChild(hidden);
+
+            const status = document.createElement('p');
+            status.className = 'channel-status';
+            status.textContent = field.value ? 'Selected: ' + field.value : 'Start typing a city name.';
+            form.appendChild(status);
+
+            const results = document.createElement('div');
+            results.className = 'channel-results';
+            form.appendChild(results);
+
+            const pickCity = (item) => {
+                hidden.value = item.id;
+                search.value = item.label;
+                status.textContent = 'Selected: ' + item.label;
+                results.innerHTML = '';
+                schedulePreview();
+            };
+
+            const render = (list) => {
+                results.innerHTML = '';
+                if (!list.length) {
+                    status.textContent = 'No matching cities on the route.';
+                    return;
+                }
+                status.textContent = 'Pick a city:';
+                list.slice(0, 12).forEach((item) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'channel-result';
+                    const nameEl = document.createElement('span');
+                    nameEl.textContent = item.label;
+                    btn.appendChild(nameEl);
+                    btn.addEventListener('click', () => pickCity(item));
+                    results.appendChild(btn);
+                });
+            };
+
+            search.addEventListener('input', async () => {
+                const query = search.value.trim().toLowerCase();
+                hidden.value = search.value.trim();
+                if (query.length < 2) {
+                    results.innerHTML = '';
+                    status.textContent = 'Type at least 2 characters.';
+                    schedulePreview();
+                    return;
+                }
+                status.textContent = 'Searching...';
+                try {
+                    const cities = await loadSantaCities();
+                    render(cities.filter((item) => item.label.toLowerCase().includes(query) || item.id.includes(query)));
+                } catch (err) {
+                    status.textContent = 'Could not load the route.';
+                    console.error(err);
+                }
+                schedulePreview();
+            });
         }
 
         function buildChannelField(field) {

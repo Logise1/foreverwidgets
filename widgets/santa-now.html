@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santa Current Location</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/shared.css">
+    <style>
+        .w-santa-now {
+            width: 420px;
+            border-radius: 22px;
+            overflow: hidden;
+            border: 4px solid #e63946;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+            position: relative;
+            color: #fff;
+            min-height: 240px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        .now-bg {
+            position: absolute; inset: 0;
+            background: #0f172a center / cover no-repeat;
+            filter: brightness(0.38);
+            transition: background-image 0.8s ease;
+        }
+        .now-content { position: relative; z-index: 1; padding: 22px; }
+        .now-label {
+            font-size: 0.78rem; letter-spacing: 2px; text-transform: uppercase;
+            font-weight: 800; color: #ffd700; margin-bottom: 6px;
+        }
+        .now-city { font-family: var(--font-heading); font-size: 2.6rem; line-height: 1; text-shadow: 0 3px 0 #e63946; }
+        .now-region { margin-top: 6px; font-weight: 700; color: #e2e8f0; }
+        .now-meta {
+            margin-top: 14px; display: flex; justify-content: space-between; gap: 10px;
+            background: rgba(0,0,0,0.45); border-radius: 12px; padding: 10px 12px; font-weight: 700;
+        }
+        .now-meta small { display: block; color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
+    </style>
+</head>
+<body class="obs-mode">
+    <div class="obs-widget w-santa-now">
+        <div id="now-bg" class="now-bg"></div>
+        <div class="now-content">
+            <div class="now-label" id="now-label">Santa is now in</div>
+            <div class="now-city" id="now-city">---</div>
+            <div class="now-region" id="now-region"></div>
+            <div class="now-meta">
+                <div><small>Next stop</small><span id="now-next">---</span></div>
+                <div style="text-align:right"><small>Arrives in</small><span id="now-timer">--:--</span></div>
+            </div>
+        </div>
+    </div>
+    <script src="../js/obs.js"></script>
+    <script src="../js/santa.js"></script>
+    <script>
+        async function start() {
+            const route = await loadSantaRoute();
+            function tick() {
+                const state = santaState(route);
+                const bg = document.getElementById('now-bg');
+                const label = document.getElementById('now-label');
+                const city = document.getElementById('now-city');
+                const region = document.getElementById('now-region');
+                const next = document.getElementById('now-next');
+                const timer = document.getElementById('now-timer');
+                if (state.phase === 'pre') {
+                    label.innerText = 'Preparing at';
+                    city.innerText = "Santa's Village";
+                    region.innerText = 'North Pole';
+                    next.innerText = state.next ? state.next.city : 'Takeoff';
+                    timer.innerText = santaFormatDuration(state.takeoff - getNow());
+                    bg.style.backgroundImage = route[0].photo_url ? `url('${route[0].photo_url}')` : 'none';
+                    return;
+                }
+                if (state.phase === 'done') {
+                    label.innerText = 'Back home at';
+                    city.innerText = "Santa's Village";
+                    region.innerText = 'North Pole';
+                    next.innerText = 'Journey complete';
+                    timer.innerText = '00:00';
+                    bg.style.backgroundImage = 'none';
+                    return;
+                }
+                label.innerText = 'Santa is now in';
+                city.innerText = state.current.city;
+                region.innerText = state.current.region || '';
+                next.innerText = state.next ? state.next.city : 'Home';
+                timer.innerText = state.next ? santaFormatDuration(state.next.arrival - getNow()) : 'Done';
+                bg.style.backgroundImage = state.current.photo_url ? `url('${state.current.photo_url}')` : 'none';
+            }
+            setInterval(tick, 1000);
+            tick();
+        }
+        start().catch((err) => console.error(err));
+    </script>
+</body>
+</html>

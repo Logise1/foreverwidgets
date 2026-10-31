@@ -15,9 +15,8 @@
             flex-direction: row;
             justify-content: center;
             align-items: center;
-            gap: 30px;
-            width: 100%;
-            max-width: 1600px;
+            width: auto;
+            max-width: none;
             background: transparent;
             border: none;
             padding: 20px;
@@ -25,11 +24,10 @@
         }
         .w-ny-list h3 { display: none; }
         #ny-list-container {
-            display: flex;
-            flex-direction: row;
+            display: grid;
             justify-content: center;
-            width: 100%;
-            gap: 30px;
+            align-items: stretch;
+            gap: 20px;
         }
         .ny-card {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -39,7 +37,8 @@
             text-align: center;
             border: 3px solid #ffd700;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            min-width: 250px;
+            min-width: 0;
+            width: var(--card-w, 250px);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -109,6 +108,11 @@
         tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
         const eventDate = qs('date', tomorrow.toISOString().slice(0, 10));
         const eventTime = qs('time', '00:00');
+        const maxZones = Math.min(12, Math.max(1, parseInt(qs('count', '3'), 10) || 3));
+        const gridCols = Math.ceil(Math.sqrt(maxZones));
+        const container = document.getElementById('ny-list-container');
+        container.style.gridTemplateColumns = `repeat(${gridCols}, 1fr)`;
+        container.style.setProperty('--card-w', gridCols >= 4 ? '210px' : gridCols >= 3 ? '230px' : '250px');
         document.getElementById('ny-overlay-title').innerText = eventTitle;
         window.celebratedCities = new Set();
         window.celebratedOverlaySet = new Set();
@@ -123,8 +127,7 @@
                 window.celebratedOverlaySet.add(happening.label);
                 setTimeout(() => overlay.classList.remove('active'), 5000);
             }
-            const container = document.getElementById('ny-list-container');
-            const listItems = upcoming.slice(0, 3);
+            const listItems = upcoming.slice(0, maxZones);
             while (container.children.length > listItems.length) container.removeChild(container.lastChild);
             listItems.forEach((item, index) => {
                 const isCelebration = item.diff <= 0;
@@ -156,8 +159,9 @@
                     timeContainer.innerText = eventTitle;
                     node.classList.add('celebrating');
                 } else {
-                    timeContainer.style.fontSize = '3rem';
-                    timeContainer.style.lineHeight = '3rem';
+                    const timeSize = maxZones >= 9 ? '2.1rem' : maxZones >= 5 ? '2.5rem' : '3rem';
+                    timeContainer.style.fontSize = timeSize;
+                    timeContainer.style.lineHeight = timeSize;
                     updateReel(timeContainer, eventFormatTime(item.diff));
                     node.classList.remove('celebrating');
                 }
